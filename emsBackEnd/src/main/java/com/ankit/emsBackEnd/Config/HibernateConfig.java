@@ -19,51 +19,37 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class HibernateConfig {
 
     @Autowired
-    Environment env;  //Environment is a Spring interface that gives access to:application.properties,application.yml,system variables,JVM arguments,👉 In short:It reads configuration values at runtime
+    Environment env;
 
-    //1 DataSource Bean
     @Bean
     public DataSource datasource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName(
-                env.getProperty("spring.datasource.driver-class-name")
-        );
-
-        ds.setUrl(
-                env.getProperty("spring.datasource.url")
-        );
-        ds.setUsername(
-                env.getProperty("spring.datasource.username")
-        );
-        ds.setPassword(
-                env.getProperty("spring.datasource.password")
-        );
-
+        ds.setDriverClassName(env.getProperty("spring.datasource.driver-class-name"));
+        ds.setUrl(env.getProperty("spring.datasource.url"));
+        ds.setUsername(env.getProperty("spring.datasource.username"));
+        ds.setPassword(env.getProperty("spring.datasource.password"));
         return ds;
     }
 
-    //2 EntityManagerFactory Bean
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(datasource());
-        emf.setPackagesToScan("com.ankit.emsBackEnd.entity");
+        emf.setPackagesToScan("com.ankit.emsBackEnd.Entity");
         emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         emf.setJpaProperties(hibernateProperties());
         return emf;
     }
 
-    //3 Hibernate Properties
     private Properties hibernateProperties() {
         Properties properties = new Properties();
-        properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
-        properties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
-        properties.put("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
-        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.format_sql", "true");
+        properties.put("hibernate.hbm2ddl.auto", "update");
         return properties;
     }
 
-    //4 Transaction Manager Bean
     @Bean
     public JpaTransactionManager transactionManager() {
         JpaTransactionManager txManager = new JpaTransactionManager();
